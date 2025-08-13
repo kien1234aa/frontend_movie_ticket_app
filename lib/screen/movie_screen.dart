@@ -1,238 +1,123 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:movie_ticket_app/widget/actor_or_director.dart';
-import 'package:movie_ticket_app/widget/cinema.dart';
 
-class MovieDetailScreen extends StatelessWidget {
+class MovieListScreen extends StatefulWidget {
+  @override
+  _MovieListScreenState createState() => _MovieListScreenState();
+}
+
+class _MovieListScreenState extends State<MovieListScreen>
+    with SingleTickerProviderStateMixin {
+  late TabController _tabController;
+
+  final List<Movie> nowPlayingMovies = [
+    Movie(
+      title: 'Shang chi: Legend of the Ten Rings',
+      rating: 4.0,
+      reviews: 982,
+      duration: '2 hour 5 minutes',
+      genres: ['Action', 'Sci-fi'],
+      posterGradient: [Colors.teal.shade800, Colors.blue.shade600],
+    ),
+    Movie(
+      title: 'Avengers: Infinity War',
+      rating: 4.5,
+      reviews: 1250,
+      duration: '2 hour 29 minutes',
+      genres: ['Action', 'Adventure'],
+      posterGradient: [Colors.red.shade800, Colors.orange.shade600],
+    ),
+  ];
+
+  final List<Movie> comingSoonMovies = [
+    Movie(
+      title: 'Batman v Superman: Dawn of Justice',
+      rating: 4.0,
+      reviews: 982,
+      duration: '2 hour 10 minutes',
+      genres: ['Action', 'Sci-fi'],
+      posterGradient: [Colors.grey.shade800, Colors.grey.shade600],
+    ),
+    Movie(
+      title: 'Guardians of the Galaxy',
+      rating: 4.2,
+      reviews: 1100,
+      duration: '2 hour 1 minutes',
+      genres: ['Action', 'Adventure'],
+      posterGradient: [Colors.purple.shade700, Colors.blue.shade600],
+    ),
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 2, vsync: this);
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFF1a1a1a),
-      body: Stack(
-        children: [
-          CustomScrollView(
-            slivers: [
-              _buildAppBar(context),
-              SliverPadding(
-                padding: EdgeInsets.all(20),
-                sliver: SliverList(
-                  delegate: SliverChildListDelegate([
-                    _buildMovieTitle(),
-                    _buildMovieMeta(),
-                    _buildRatingSection(),
-                    _buildMovieDetails(),
-                    _buildStorylineSection(),
-                    _buildDirectorSection(),
-                    _buildActorSection(),
-                    _buildCinemaSection(),
-                    SizedBox(height: 100), // Space for bottom button
-                  ]),
-                ),
+      backgroundColor: Colors.black,
+      body: SafeArea(
+        child: Column(
+          children: [
+            // Tab bar
+            Container(
+              margin: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+              decoration: BoxDecoration(
+                color: Colors.grey.shade900,
+                borderRadius: BorderRadius.circular(25),
               ),
-            ],
-          ),
-          _buildContinueButton(context),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildAppBar(BuildContext context) {
-    return SliverAppBar(
-      expandedHeight: 200,
-      pinned: false,
-      backgroundColor: Colors.transparent,
-      leading: Container(
-        margin: EdgeInsets.all(8),
-        decoration: BoxDecoration(
-          color: Colors.black.withOpacity(0.5),
-          shape: BoxShape.circle,
-        ),
-        child: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => Navigator.pop(context),
-        ),
-      ),
-      flexibleSpace: FlexibleSpaceBar(
-        background: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [
-                Colors.red.withOpacity(0.3),
-                Colors.black.withOpacity(0.8),
-              ],
-            ),
-          ),
-          child: Stack(
-            children: [
-              // Placeholder for movie poster
-              Container(
-                color: Color(0xFF331111),
-                child: Center(
-                  child: Image.network(
-                    "https://images8.alphacoders.com/979/979286.jpg",
-                    fit: BoxFit.contain,
+              child: TabBar(
+                controller: _tabController,
+                indicator: BoxDecoration(
+                  color: Colors.amber.shade600,
+                  borderRadius: BorderRadius.circular(25),
+                ),
+                indicatorSize: TabBarIndicatorSize.tab,
+                dividerColor: Colors.transparent,
+                labelColor: Colors.black,
+                unselectedLabelColor: Colors.white,
+                labelStyle: TextStyle(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 16,
+                ),
+                unselectedLabelStyle: TextStyle(
+                  fontWeight: FontWeight.w500,
+                  fontSize: 16,
+                ),
+                tabs: [
+                  Tab(
+                    child: Container(
+                      padding: EdgeInsets.symmetric(horizontal: 16),
+                      child: Text('Now playing'),
+                    ),
                   ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildMovieTitle() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Avengers: Infinity War',
-          style: TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-          ),
-        ),
-        SizedBox(height: 8),
-      ],
-    );
-  }
-
-  Widget _buildMovieMeta() {
-    return Row(
-      children: [
-        Text('2h 29m', style: TextStyle(color: Colors.grey, fontSize: 14)),
-        Text(' • ', style: TextStyle(color: Colors.grey)),
-        Text('18.12.2022', style: TextStyle(color: Colors.grey, fontSize: 14)),
-      ],
-    );
-  }
-
-  Widget _buildRatingSection() {
-    return Padding(
-      padding: EdgeInsets.symmetric(vertical: 16),
-      child: Row(
-        children: [
-          Text(
-            'Review ★4.8 (1322)',
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
-          ),
-          SizedBox(width: 8),
-          Row(
-            children: List.generate(5, (index) {
-              return Icon(
-                Icons.star,
-                size: 16,
-                color: index < 4 ? Colors.amber : Colors.grey[700],
-              );
-            }),
-          ),
-          SizedBox(width: 8),
-          OutlinedButton.icon(
-            onPressed: () {},
-            icon: Icon(Icons.play_arrow, size: 16, color: Colors.white),
-            label: Text(
-              'Watch trailer',
-              style: TextStyle(fontSize: 12, color: Colors.white),
-            ),
-            style: OutlinedButton.styleFrom(
-              side: BorderSide(color: Colors.grey),
-              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
+                  Tab(
+                    child: Container(
+                      padding: EdgeInsets.symmetric(horizontal: 16),
+                      child: Text('Coming soon'),
+                    ),
+                  ),
+                ],
               ),
             ),
-          ),
-        ],
-      ),
-    );
-  }
 
-  Widget _buildMovieDetails() {
-    return Padding(
-      padding: EdgeInsets.only(bottom: 24),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildDetailItem('Movie genre:', 'Action, adventure, sci-fi'),
-                SizedBox(height: 16),
-                _buildDetailItem('Language:', 'English'),
-              ],
-            ),
-          ),
-          SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildDetailItemWithLink('Censorship:', '18+', 'See more'),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildDetailItem(String label, String value) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(label, style: TextStyle(color: Colors.grey, fontSize: 14)),
-        SizedBox(height: 4),
-        Text(value, style: TextStyle(color: Colors.white, fontSize: 14)),
-      ],
-    );
-  }
-
-  Widget _buildDetailItemWithLink(String label, String value, String linkText) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(label, style: TextStyle(color: Colors.grey, fontSize: 14)),
-        SizedBox(height: 4),
-        Row(
-          children: [
-            Text(value, style: TextStyle(color: Colors.white, fontSize: 14)),
-            SizedBox(width: 8),
-            GestureDetector(
-              onTap: () {},
-              child: Text(
-                linkText,
-                style: TextStyle(color: Colors.blue, fontSize: 14),
-              ),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-
-  Widget _buildStorylineSection() {
-    return _buildSection(
-      'Storyline',
-      RichText(
-        text: TextSpan(
-          style: TextStyle(color: Colors.grey[300], fontSize: 14, height: 1.5),
-          children: [
-            TextSpan(
-              text:
-                  'As the Avengers and their allies have continued to protect the world from threats too large for any one hero to handle, a new danger has emerged from the cosmic shadows: Thanos. ',
-            ),
-            WidgetSpan(
-              child: GestureDetector(
-                onTap: () {},
-                child: Text(
-                  'See more',
-                  style: TextStyle(color: Colors.blue, fontSize: 14),
-                ),
+            // Tab content
+            Expanded(
+              child: TabBarView(
+                controller: _tabController,
+                children: [
+                  // Now playing tab
+                  MovieGrid(movies: nowPlayingMovies),
+                  // Coming soon tab
+                  MovieGrid(movies: comingSoonMovies),
+                ],
               ),
             ),
           ],
@@ -240,193 +125,225 @@ class MovieDetailScreen extends StatelessWidget {
       ),
     );
   }
+}
 
-  Widget _buildDirectorSection() {
-    return _buildSection(
-      'Director',
-      Row(
-        children: [
-          ProfileCard(title: 'Anthony Russo'),
-          SizedBox(width: 12),
-          ProfileCard(title: 'Joe Russo'),
-        ],
+class MovieGrid extends StatelessWidget {
+  final List<Movie> movies;
+
+  const MovieGrid({Key? key, required this.movies}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return GridView.builder(
+      padding: EdgeInsets.all(16),
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        crossAxisSpacing: 16,
+        mainAxisSpacing: 20,
+        childAspectRatio: 0.65,
       ),
+      itemCount: movies.length,
+      itemBuilder: (context, index) {
+        return MovieCard(movie: movies[index]);
+      },
     );
   }
+}
 
-  Widget _buildActorSection() {
-    return _buildSection(
-      'Actor',
-      Row(
-        children: [
-          ProfileCard(title: 'Robert Downey Jr.'),
-          SizedBox(width: 12),
-          ProfileCard(title: 'Chris Evans'),
-        ],
-      ),
-    );
-  }
+class MovieCard extends StatelessWidget {
+  final Movie movie;
 
-  Widget _buildCinemaSection() {
-    return _buildSection(
-      'Cinema',
-      Column(
-        children: [
-          CinemaCard(
-            title: 'Vincom Ocean Park CGV',
-            distance: '9.32km',
-            address: 'hanoi',
-            logoPath:
-                'https://w7.pngwing.com/pngs/330/793/png-transparent-cgv-buena-park-8-cgv-cinemas-indonesia-cj-cgv-film-zen-love-text-hand.png',
-          ),
-          SizedBox(height: 12),
-          CinemaCard(
-            title: 'BHD Star Cineplex',
-            distance: '5.67km',
-            address: 'ho chi minh city',
-          ),
-          SizedBox(height: 12),
-          CinemaCard(
-            title: 'Galaxy Cinema',
-            distance: '3.45km',
-            address: 'da nang',
-          ),
-        ],
-      ),
-    );
-  }
+  const MovieCard({Key? key, required this.movie}) : super(key: key);
 
-  Widget _buildSection(String title, Widget content) {
-    return Padding(
-      padding: EdgeInsets.only(bottom: 24),
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        // Navigate to movie details
+        print('Tapped on ${movie.title}');
+      },
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            title,
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
-          ),
-          SizedBox(height: 16),
-          content,
-        ],
-      ),
-    );
-  }
-
-  Widget _buildPersonItem(String name, String initials) {
-    return Padding(
-      padding: EdgeInsets.only(bottom: 12),
-      child: Row(
-        children: [
-          CircleAvatar(
-            radius: 20,
-            backgroundColor: Colors.grey[700],
-            child: Text(
-              initials,
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 12,
-                fontWeight: FontWeight.bold,
+          // Movie poster
+          Expanded(
+            child: Container(
+              width: double.infinity,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
+                gradient: LinearGradient(
+                  colors: movie.posterGradient,
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.3),
+                    blurRadius: 8,
+                    offset: Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: Stack(
+                  children: [
+                    // Poster placeholder with movie initial
+                    Center(
+                      child: Text(
+                        movie.title[0].toUpperCase(),
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 48,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    // Overlay for better text visibility
+                    Container(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [
+                            Colors.transparent,
+                            Colors.black.withOpacity(0.7),
+                          ],
+                          stops: [0.6, 1.0],
+                        ),
+                      ),
+                    ),
+                    // Movie title overlay
+                    Positioned(
+                      bottom: 12,
+                      left: 12,
+                      right: 12,
+                      child: Text(
+                        movie.title.toUpperCase(),
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 1.2,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
-          SizedBox(width: 12),
+
+          SizedBox(height: 12),
+
+          // Movie title
           Text(
-            name,
+            movie.title,
             style: TextStyle(
               color: Colors.white,
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
             ),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
           ),
-        ],
-      ),
-    );
-  }
 
-  Widget _buildCinemaItem(String name, String address, {bool isLive = false}) {
-    return Container(
-      margin: EdgeInsets.only(bottom: 12),
-      padding: EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Color(0xFF2a2a2a),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Stack(
-        children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          SizedBox(height: 8),
+
+          // Rating
+          Row(
             children: [
+              Icon(Icons.star, color: Colors.amber.shade600, size: 16),
+              SizedBox(width: 4),
               Text(
-                name,
+                movie.rating.toString(),
                 style: TextStyle(
                   color: Colors.white,
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
-              SizedBox(height: 4),
-              Text(address, style: TextStyle(color: Colors.grey, fontSize: 12)),
+              SizedBox(width: 4),
+              Text(
+                '(${movie.reviews})',
+                style: TextStyle(color: Colors.grey.shade400, fontSize: 14),
+              ),
             ],
           ),
-          if (isLive)
-            Positioned(
-              top: 0,
-              right: 0,
-              child: Container(
-                padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                decoration: BoxDecoration(
-                  color: Colors.red,
-                  borderRadius: BorderRadius.circular(4),
-                ),
+
+          SizedBox(height: 4),
+
+          // Duration
+          Row(
+            children: [
+              Icon(Icons.access_time, color: Colors.grey.shade400, size: 16),
+              SizedBox(width: 4),
+              Text(
+                movie.duration,
+                style: TextStyle(color: Colors.grey.shade400, fontSize: 14),
+              ),
+            ],
+          ),
+
+          SizedBox(height: 4),
+
+          // Genres
+          Row(
+            children: [
+              Icon(Icons.local_movies, color: Colors.grey.shade400, size: 16),
+              SizedBox(width: 4),
+              Expanded(
                 child: Text(
-                  'LIVE',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 10,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  movie.genres.join(', '),
+                  style: TextStyle(color: Colors.grey.shade400, fontSize: 14),
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
-            ),
+            ],
+          ),
         ],
       ),
     );
   }
+}
 
-  Widget _buildContinueButton(BuildContext context) {
-    return Positioned(
-      bottom: 20,
-      left: 20,
-      right: 20,
-      child: Container(
-        width: double.infinity,
-        child: ElevatedButton(
-          onPressed: () {
-            HapticFeedback.lightImpact();
-            ScaffoldMessenger.of(
-              context,
-            ).showSnackBar(SnackBar(content: Text('Continue pressed')));
-          },
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.amber,
-            foregroundColor: Colors.black,
-            padding: EdgeInsets.symmetric(vertical: 16),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-            elevation: 0,
-          ),
-          child: Text(
-            'Continue',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-          ),
-        ),
+// Movie model
+class Movie {
+  final String title;
+  final double rating;
+  final int reviews;
+  final String duration;
+  final List<String> genres;
+  final List<Color> posterGradient;
+
+  Movie({
+    required this.title,
+    required this.rating,
+    required this.reviews,
+    required this.duration,
+    required this.genres,
+    required this.posterGradient,
+  });
+}
+
+// Main app để test
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Movie List',
+      theme: ThemeData(
+        primarySwatch: Colors.amber,
+        visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
+      home: MovieListScreen(),
+      debugShowCheckedModeBanner: false,
     );
   }
+}
+
+void main() {
+  runApp(MyApp());
 }

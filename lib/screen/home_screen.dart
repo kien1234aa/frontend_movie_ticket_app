@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:movie_ticket_app/screen/movie_screen.dart';
+import 'package:movie_ticket_app/screen/profile_screen.dart';
+import 'package:movie_ticket_app/screen/ticket_movie_screen.dart';
 import 'package:movie_ticket_app/utils/app_colors.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -9,7 +12,6 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  int _selectedIndex = 0;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -36,7 +38,6 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
       ),
-      bottomNavigationBar: _buildBottomNavBar(),
     );
   }
 
@@ -449,6 +450,32 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ), // Space for bottom nav
       ],
+    );
+  }
+}
+
+class HomePage extends StatefulWidget {
+  const HomePage({super.key});
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  int _selectedIndex = 0;
+
+  List<Widget> _page = [
+    HomeScreen(),
+    MyTicketScreen(),
+    MovieListScreen(),
+    ProfileScreen(),
+  ];
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: AppColors.backgroundColor,
+      body: _page[_selectedIndex],
+      bottomNavigationBar: _buildBottomNavBar(),
     );
   }
 
