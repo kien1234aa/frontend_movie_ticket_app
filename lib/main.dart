@@ -3,7 +3,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:movie_ticket_app/bloc/changeLanguage/language_bloc.dart';
 import 'package:movie_ticket_app/bloc/changeLanguage/language_state.dart';
+import 'package:movie_ticket_app/screen/chose_seet.dart';
 import 'package:movie_ticket_app/screen/home_screen.dart';
+import 'package:movie_ticket_app/screen/movie_screen.dart';
 import 'package:movie_ticket_app/screen/signup/signup_otp.dart';
 import 'package:movie_ticket_app/screen/signup/signup_screen.dart';
 import 'package:movie_ticket_app/screen/signup/signup_setname.dart';
@@ -39,7 +41,7 @@ class MyApp extends StatelessWidget {
             GlobalWidgetsLocalizations.delegate,
             GlobalCupertinoLocalizations.delegate,
           ],
-          home: HomeScreen(),
+          home: SeatSelectionScreen(),
         );
       },
     );
